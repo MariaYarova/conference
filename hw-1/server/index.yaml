@@ -1,0 +1,247 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'Arch Lab Example API'
+  description: Пример API для первого домашнего задания по курсу Архитектура программных систем
+servers:
+  - url: http://127.0.0.1
+    description: Sample server
+paths:
+  /accept_article:
+    get:
+      summary: Accept an article by id
+      parameters:
+        - name: id
+          description: Id of article
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Article accepted
+        404:
+          description: Already accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /article:
+    post:
+      summary: Create new article
+      parameters:
+      - name: login
+        description: Author's login
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: article_number_in_catalog
+        description: Serial number of the article in the catalog
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: organization
+        description: Full name of the organization
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: field_of_study
+        description: Research area of the article
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: article_dt
+        description: Article completion date (mm/dd/yyyy)
+        in: query
+        required: true
+        schema:
+          type: string
+
+      responses:
+        '200':
+          description: Added article
+        404:
+          description: Article is already added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Get information about articles.
+      parameters:
+      - name: in_conf
+        description: If you want to get atricles, which were accepted for the conference, pass 1
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+          '200':
+            description: Returned all articles
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /search:
+    get:
+      summary: Search authors by mask of first name and last name
+      parameters:
+      - name: first_name
+        description: Имя
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: last_name
+        description: Фамилия
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The authors corresponding to the provided masks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authors'
+        404:
+          description: No author found for the provided mask
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /author:
+    get:
+      summary: Read a author information
+      parameters:
+      - name: login
+        description: Уникальный идентификатор автора
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/author_login'
+      responses:
+        '200':
+          description: The author corresponding to the provided `login`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/author'
+        404:
+          description: No author found for the provided `login`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Add author information
+      parameters:
+      - name: login
+        description: User's login
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: first_name
+        description: Имя автора
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: last_name
+        description: Фамилия автора
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: email
+        description: email автора
+        in: query
+        required: true
+        schema:
+          type: string
+
+      responses:
+        '200':
+          description: Идентификатор, добавленного автора
+          content:
+            application/json:
+              schema:
+                type: integer
+        404:
+          description: No author found for the provided `login`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    author_login:
+      description: Уникальный идентификатор автора
+      type: string
+    authors:
+      type: array
+      items:
+        $ref: '#/components/schemas/author'
+    author:
+      type: object
+      required:
+        - login
+        - first_name
+        - last_name
+        - email
+      properties:
+        login:
+          $ref: '#/components/schemas/author_login'
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: A human readable error message
+          type: string
