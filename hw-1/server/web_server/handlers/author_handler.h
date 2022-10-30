@@ -229,7 +229,7 @@ public:
         }
         response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         std::ostream &ostr = response.send();
-        ostr << "request error";
+        ostr << "Author request error";
         response.send();
     }
 

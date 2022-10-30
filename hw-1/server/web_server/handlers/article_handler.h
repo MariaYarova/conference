@@ -57,10 +57,9 @@ public:
         HTMLForm form(request, request.stream());
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET) {
             if (form.has("in_conf")) {
+                int in_conf = stoi(form.get("in_conf"));
                 try
                 {
-                    int in_conf = stoi(form.get("in_conf"));
-                    std::cout << "-1" << std::endl;
                     std::vector<database::Article> result;
                     if (in_conf) {
                         result = database::Article::read_all_on_conf();
@@ -68,22 +67,16 @@ public:
                         result = database::Article::read_all();
                     }
 
-                    std::cout << "0" << std::endl;
                     Poco::JSON::Array arr;
                     for (auto s : result)
                         arr.add(s.toJSON());
 
-                    std::cout << "1" << std::endl;
                     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
                     response.setChunkedTransferEncoding(true);
                     response.setContentType("application/json");
-                    std::cout << "2" << std::endl;
                     std::ostream &ostr = response.send();
-                    std::cout << "3" << std::endl;
                     Poco::JSON::Stringifier::stringify(arr, ostr);
-                    std::cout << "4" << std::endl;
-                    // response.send();
-                    // std::cout << "5" << std::endl;
+                    response.send();
                 }
                 catch (...)
                 {
@@ -159,7 +152,7 @@ public:
         }
         response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         std::ostream &ostr = response.send();
-        ostr << "request error\n";
+        ostr << "Article request error\n";
         response.send();
     }
 
